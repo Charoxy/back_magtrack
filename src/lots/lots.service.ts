@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, HttpCode, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { Lot } from "../entities/entitie.lots";
 import { IsNull, Not, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -120,8 +120,8 @@ export class LotsService {
   }
 
   async deleteAction(id: number, userid: number) {
-    const action = await this.lotActionRepository.findOne({where: {id: id}});
-
+    const action = await this.lotActionRepository.findOne({where: {id: id}, relations: ['lot']});
+  
     if(action == null){
       throw new NotFoundException("Aucune action trouvée");
     }
@@ -131,8 +131,7 @@ export class LotsService {
     }
 
     await this.lotActionRepository.delete({id: id});
-    return true;
-  }
+    }
 
 
   async createLot(lot: CreateLotDto, userid:number) {

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Request, UseGuards } from "@nestjs/common";
 import { LotsService } from "./lots.service";
 import { CreateLotDto } from "../dto/lotsmake.dto";
 import { AuthGuard } from "../auth/auth.guard";
@@ -49,6 +49,7 @@ export class LotsController {
     return this.lotsService.addAction(id, action, req.user.sub);
   }
 
+  @HttpCode(HttpStatus.OK)
   @Delete('actions/:id')
   deleteAction(@Request() req, @Param('id') id: number) {
     return this.lotsService.deleteAction(id, req.user.sub);
