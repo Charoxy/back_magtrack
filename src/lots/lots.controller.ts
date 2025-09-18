@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { LotsService } from "./lots.service";
 import { CreateLotDto } from "../dto/lotsmake.dto";
 import { AuthGuard } from "../auth/auth.guard";
 import { CreateLotActionDto } from "../dto/create-lot-action.dto";
 import { ChangeEnvDTO } from "../dto/change-env.dto";
+import { CreateShareLots } from "src/dto/create-share-lots";
 
 @UseGuards(AuthGuard)
 @Controller('lots')
@@ -35,7 +36,7 @@ export class LotsController {
   }
 
   @Get('old')
-  getFermeLots(@Request() req) {
+  getOldLots(@Request() req) {
     return this.lotsService.findOld(req.user.sub);
   }
 
@@ -55,6 +56,15 @@ export class LotsController {
     return this.lotsService.deleteAction(id, req.user.sub);
   }
 
+  @Get('stageWithDays/:id')
+  getStage(@Request() req, @Param('id') id: number, @Query('date') date: string) {
+    return this.lotsService.getStage(id, req.user.sub, new Date(date));
+  }
+
+  @Post('share-lots')
+  makeShareLot(@Request() req, @Body() shareLot: CreateShareLots) {
+    return this.lotsService.makeShareLot(shareLot, req.user.sub);
+  }
 
 
 }

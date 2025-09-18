@@ -7,9 +7,10 @@ import { VarieteModule } from "../variete/variete.module";
 import { EnvironmentsModule } from "../environments/environments.module";
 import { UsersModule } from 'src/users/users.module';
 import { LotAction } from "../entities/entitie.lots-action";
+import { ShareLots } from 'src/entities/entitie.share-lots';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Lot, LotAction]), VarieteModule, EnvironmentsModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([Lot, LotAction, ShareLots]), VarieteModule, EnvironmentsModule, UsersModule],
   controllers: [LotsController],
   providers: [LotsService]
 })

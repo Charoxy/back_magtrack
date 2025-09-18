@@ -16,6 +16,7 @@ import { Nutriments } from "./entities/entitie.nutriments";
 import { NutrimentAction } from "./entities/entitie.nutriments-action";
 import { NutrimentsController } from './nutriments/nutriments.controller';
 import { NutrimentsModule } from './nutriments/nutriments.module';
+import { ShareLots } from './entities/entitie.share-lots';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { NutrimentsModule } from './nutriments/nutriments.module';
         LotAction,
         Nutriments,
         NutrimentAction,
+        ShareLots,
       ],
       synchronize: true,
     }),

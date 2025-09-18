@@ -11,6 +11,9 @@ import { LotAction } from "../entities/entitie.lots-action";
 import { CreateLotActionDto } from "../dto/create-lot-action.dto";
 import { NutrimentAction } from "../entities/entitie.nutriments-action";
 import { ChangeEnvDTO } from "../dto/change-env.dto";
+import { ShareLots } from "src/entities/entitie.share-lots";
+import { CreateShareLots } from "src/dto/create-share-lots";
+import { link } from "fs";
 
 @Injectable()
 export class LotsService {
@@ -21,6 +24,9 @@ export class LotsService {
 
     @InjectRepository(LotAction)
     private readonly lotActionRepository: Repository<LotAction>,
+
+    @InjectRepository(ShareLots)
+    private readonly shareLotsRepository: Repository<ShareLots>,
 
     private varieteService: VarieteService,
     private environementService: EnvironmentsService,
@@ -84,13 +90,25 @@ export class LotsService {
       });
     }
 
-    // 🔁 Changer la stage
+    // 🔁 Changer la stage + dateFin si maturation
     if(action.stage){
       actionToSave.stage = action.stage;
 
-      await this.lotRepository.update(actionToSave.lotId, {
-        etapeCulture: action.stage
-      });
+      if(action.stage == 'maturation'){
+
+        await this.lotRepository.update(actionToSave.lotId, {
+          etapeCulture: action.stage,
+          dateFin: new Date(action.date)
+        });
+
+      }else{
+
+        await this.lotRepository.update(actionToSave.lotId, {
+          etapeCulture: action.stage
+        });
+
+      }
+
     }
 
     if(action.OldEnv != null && action.NewEnv != null){
@@ -165,6 +183,44 @@ export class LotsService {
 
   async findOld(userId: number): Promise<Lot[]> {
     return await this.lotRepository.find({ where: { userId: userId,  dateFin: Not(IsNull()) } });
+  }
+
+  async getStage(id: number, userId: number, date: Date): Promise<any> {
+    const lot = await this.lotRepository.findOne({ where: { id: id, userId: userId } });
+
+    if (!lot) {
+      throw new HttpException("Lot non trouvé", HttpStatus.NOT_FOUND);
+    }
+
+    if(lot.userId != userId) {
+      throw new HttpException("Vous n'avez pas accès à cette ressource", HttpStatus.FORBIDDEN);
+    }
+
+    return await this.lotActionRepository.query(`SELECT stage, DATEDIFF(?, date) AS jours_ecoules FROM lot_action WHERE type = 'stage' AND date <= ? AND lotId = ? ORDER BY date DESC LIMIT 1`, [date, date, id]);
+  }
+
+  async makeShareLot(shareLot: CreateShareLots, userId: number) {
+    shareLot.lotId = shareLot.lotId;
+    
+    const lot = await this.lotRepository.findOne({ where: { id: shareLot.lotId, userId: userId } });
+
+    if (!lot) {
+      throw new HttpException("Lot non trouvé", HttpStatus.NOT_FOUND);
+    }
+
+    if(lot.userId != userId) {
+      throw new HttpException("Vous n'avez pas accès à cette ressource", HttpStatus.FORBIDDEN);
+    }
+
+    const exist = await this.shareLotsRepository.findOne({ where: { lotId: shareLot.lotId } });
+
+    if(exist){
+      return {uuid : exist.id};
+    }
+
+    const newShare = await this.shareLotsRepository.save(shareLot);
+
+    return {uuid : newShare.id};
   }
 
 }

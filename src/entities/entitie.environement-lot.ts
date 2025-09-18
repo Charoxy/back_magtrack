@@ -21,7 +21,7 @@ export class EnvironnementLot {
   @Column()
   environnementId: number
 
-  @Column({ type: 'enum', enum: ['culture', 'séchage', 'stockage', 'autre'] })
+  @Column({ type: 'enum', enum: ['culture', 'séchage', 'maturation', 'autre'] })
   etape: string;
 
   @Column({ type: 'date' })

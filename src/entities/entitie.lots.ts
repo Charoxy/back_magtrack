@@ -5,12 +5,14 @@ import {
   ManyToOne,
   OneToMany,
   CreateDateColumn,
-  UpdateDateColumn, JoinColumn
+  UpdateDateColumn, JoinColumn,
+  OneToOne
 } from "typeorm";
 import { EnvironnementLot } from './entitie.environement-lot';
 import { Variete } from "./entitie.variete";
 import { User } from "./entitie.user";
 import { LotAction } from "./entitie.lots-action";
+import { ShareLots } from "./entitie.share-lots";
 
 @Entity("lots")
 export class Lot {
@@ -32,7 +34,7 @@ export class Lot {
   @Column()
   planteQuantite: number;
 
-  @Column({type: 'enum', enum: ['Croissance', 'Floraison', 'Sechage', 'Curring', 'Stockage'], default: 'Croissance'})
+  @Column({type: 'enum', enum: ['Croissance', 'Floraison', 'Sechage', 'Maturation', 'Stockage',], default: 'Croissance'})
   etapeCulture: string;
 
   @Column({nullable: true})
@@ -59,4 +61,7 @@ export class Lot {
 
   @OneToMany(() => LotAction, action => action.lot)
   actions: LotAction[];
+
+  @OneToOne(() => ShareLots, shareLots => shareLots.lot)
+  shareLots: ShareLots;
 }
