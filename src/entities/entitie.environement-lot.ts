@@ -25,10 +25,10 @@ export class EnvironnementLot {
   etape: string;
 
   @Column({ type: 'date' })
-  date_entree: Date;
+  date_entree: string;
 
   @Column({ type: 'date', nullable: true })
-  date_sortie: Date;
+  date_sortie: string;
 
   @Column({ type: 'text', nullable: true })
   commentaire: string;

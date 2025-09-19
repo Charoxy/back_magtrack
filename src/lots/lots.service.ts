@@ -119,7 +119,7 @@ export class LotsService {
       environmentLot.lotId = actionToSave.lotId;
       environmentLot.environnementId = action.NewEnv;
       environmentLot.etape = etape;
-      environmentLot.date_entree = new Date(action.date);
+      environmentLot.date_entree = action.date;
       environmentLot.date_sortie = null;
       environmentLot.commentaire = null;
       await this.environementService.makeEnvironmentLot(environmentLot);
@@ -167,7 +167,7 @@ export class LotsService {
     newEnvLot.lotId = lots.id;
     newEnvLot.environnementId = lot.environmentId;
     newEnvLot.etape = 'culture';
-    newEnvLot.date_entree = new Date();
+    newEnvLot.date_entree = new Date().toISOString().substring(0,10);
     newEnvLot.date_sortie = null;
     newEnvLot.commentaire = null;
 
@@ -222,5 +222,12 @@ export class LotsService {
 
     return {uuid : newShare.id};
   }
+
+
+  // Public lots 
+
+
+
+
 
 }

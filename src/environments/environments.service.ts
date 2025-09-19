@@ -9,6 +9,7 @@ import e from "express";
 import { EnvMake } from "../dto/envmake";
 import { CreateConditionEnvironnementaleDto } from "../dto/conditionenvMake";
 import { User } from "../entities/entitie.user";
+import moment from "moment-timezone";
 
 @Injectable()
 export class EnvironmentsService {
@@ -39,9 +40,7 @@ export class EnvironmentsService {
   }
 
   async isTodayConditionsIsSubmitted(id: number): Promise<boolean> {
-      console.log(id)
       const condition = await this.conditionEnvironnementalesRepository.findOne({where: {environnementId: id}, order: {date_heure: 'DESC'}});
-      console.log(condition)
 
       if(condition == null || condition.date_heure.toISOString().substring(0,10) != new Date().toISOString().substring(0,10)){
           return false;
@@ -108,10 +107,10 @@ export class EnvironmentsService {
 
     const conditionEnv = new ConditionEnvironnementale();
     const actualEnv = await this.getActualEnvironementLot(condition.LotId, condition.date_heure,userId);
-    console.log(condition.date_heure);
+
 
     conditionEnv.environnementId = actualEnv[0].environnementId;
-    conditionEnv.date_heure = condition.date_heure;
+    conditionEnv.date_heure = moment(condition.date_heure).tz("Europe/Paris").toDate();
     conditionEnv.temperature = condition.temperature;
     conditionEnv.humidite = condition.humidite;
     conditionEnv.co2 = condition.co2;

@@ -16,6 +16,7 @@ import { ShareLots } from "./entitie.share-lots";
 
 @Entity("lots")
 export class Lot {
+  
   @PrimaryGeneratedColumn()
   id: number;
 
