@@ -32,9 +32,8 @@ import { TransformationModule } from './transformation/transformation.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.local',
-      // Ne pas ignorer le fichier .env en production, mais il sera override par les vars système
-      ignoreEnvFile: false,
+      envFilePath: ['.env.local', '.env'],
+      expandVariables: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
