@@ -177,6 +177,34 @@ export class InitNutriments1727721800000 implements MigrationInterface {
             ('Amino Bloom', 'Metrop', 'organique', 'Acides aminés floraison', 1)
         `);
 
+        // Amendements organiques naturels
+        await queryRunner.query(`
+            INSERT INTO nutriments (nom, marque, type, description, isPublic) VALUES
+            ('Thé de Compost', 'Fait Maison', 'organique', 'Infusion aérée de compost riche en microorganismes', 1),
+            ('Thé de Lombricompost', 'Fait Maison', 'organique', 'Infusion de vermicompost microbes bénéfiques', 1),
+            ('Purin d\'Ortie', 'Fait Maison', 'organique', 'Macération ortie azote et minéraux NPK 5-1-1', 1),
+            ('Purin de Consoude', 'Fait Maison', 'organique', 'Macération consoude potassium NPK 1-1-5', 1),
+            ('Purin de Prêle', 'Fait Maison', 'organique', 'Macération prêle silice fongicide préventif', 1),
+            ('Fumier de Poule', 'Biologique', 'organique', 'Fumier composté riche azote NPK 4-2-2', 1),
+            ('Fumier de Cheval', 'Biologique', 'organique', 'Fumier composté équilibré NPK 2-1-2', 1),
+            ('Guano de Chauve-souris', 'Biologique', 'organique', 'Guano riche phosphore floraison NPK 3-10-1', 1),
+            ('Guano d\'Oiseaux de Mer', 'Biologique', 'organique', 'Guano équilibré complet NPK 12-12-2', 1),
+            ('Farine de Sang', 'Biologique', 'organique', 'Azote à libération rapide NPK 12-0-0', 1),
+            ('Farine d\'Os', 'Biologique', 'organique', 'Phosphore à libération lente NPK 4-12-0', 1),
+            ('Farine de Plumes', 'Biologique', 'organique', 'Azote à libération lente NPK 12-0-0', 1),
+            ('Tourteau de Neem', 'Biologique', 'organique', 'Engrais et insecticide naturel NPK 6-1-2', 1),
+            ('Tourteau de Ricin', 'Biologique', 'organique', 'Engrais et répulsif ravageurs NPK 6-2-1', 1),
+            ('Poudre de Kelp', 'Biologique', 'organique', 'Algues marines hormones croissance oligos', 1),
+            ('Mélasse', 'Biologique', 'organique', 'Sucres complexes nourriture microbes', 1),
+            ('Acides Humiques', 'Biologique', 'organique', 'Acides humiques et fulviques naturels', 1),
+            ('Biochar', 'Biologique', 'organique', 'Charbon actif rétention eau et nutriments', 1),
+            ('Cendres de Bois', 'Biologique', 'organique', 'Potassium et calcium naturels NPK 0-1-3', 1),
+            ('Basalte', 'Biologique', 'minerale', 'Poudre de roche volcanique reminéralisant', 1),
+            ('Azomite', 'Biologique', 'minerale', 'Poudre volcanique 70+ oligo-éléments', 1),
+            ('Dolomite', 'Biologique', 'minerale', 'Calcaire magnésien pH calcium magnésium', 1),
+            ('Gypse', 'Biologique', 'minerale', 'Sulfate de calcium améliore structure sol', 1)
+        `);
+
         // Divers
         await queryRunner.query(`
             INSERT INTO nutriments (nom, marque, type, description, isPublic) VALUES
