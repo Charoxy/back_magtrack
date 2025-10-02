@@ -10,9 +10,9 @@ export class InitNutriments1727721800000 implements MigrationInterface {
             ('Fish·Mix', 'BioBizz', 'organique', 'Engrais organique à base de poisson NPK 5-1-4', 1),
             ('Top·Max', 'BioBizz', 'organique', 'Stimulateur de floraison 100% organique acides humiques', 1),
             ('Bio·Heaven', 'BioBizz', 'organique', 'Stimulateur énergétique antistress acides aminés', 1),
-            ('Alg·A·Mic', 'BioBizz', 'organique', 'Revitalisant à base d\'algues marines concentrées', 1),
+            ('Alg·A·Mic', 'BioBizz', 'organique', 'Revitalisant à base d''algues marines concentrées', 1),
             ('Root·Juice', 'BioBizz', 'organique', 'Stimulateur racinaire 100% biologique algues', 1),
-            ('Acti·Vera', 'BioBizz', 'organique', 'Protecteur végétal naturel à l\'aloe vera', 1)
+            ('Acti·Vera', 'BioBizz', 'organique', 'Protecteur végétal naturel à l''aloe vera', 1)
         `);
 
         // Advanced Nutrients - Gamme chimique pH Perfect
@@ -74,7 +74,7 @@ export class InitNutriments1727721800000 implements MigrationInterface {
             ('Aqua Vega B', 'Canna', 'chimique', 'Base hydro croissance B NPK 0-4-2', 1),
             ('Aqua Flores A', 'Canna', 'chimique', 'Base hydro floraison A NPK 5-0-0', 1),
             ('Aqua Flores B', 'Canna', 'chimique', 'Base hydro floraison B NPK 0-5-4', 1),
-            ('Rhizotonic', 'Canna', 'organique', 'Stimulateur racinaire à base d\'algues', 1),
+            ('Rhizotonic', 'Canna', 'organique', 'Stimulateur racinaire à base d''algues', 1),
             ('Cannazym', 'Canna', 'organique', 'Enzymes pour recyclage nutriments', 1),
             ('Boost', 'Canna', 'organique', 'Accélérateur métabolisme floraison', 1),
             ('PK 13/14', 'Canna', 'chimique', 'Booster phosphore-potassium NPK 0-13-14', 1),
@@ -113,7 +113,7 @@ export class InitNutriments1727721800000 implements MigrationInterface {
             ('Bud-XL', 'House & Garden', 'chimique', 'Booster cellules floraison NPK 0-0-1', 1),
             ('Top Booster', 'House & Garden', 'chimique', 'Finisseur NPK 4-0-5', 1),
             ('Shooting Powder', 'House & Garden', 'chimique', 'PK booster extrême sachet NPK 0-0-1', 1),
-            ('Algen Extract', 'House & Garden', 'organique', 'Extrait d\'algues marines Ascophyllum', 1),
+            ('Algen Extract', 'House & Garden', 'organique', 'Extrait d''algues marines Ascophyllum', 1),
             ('Amino Treatment', 'House & Garden', 'organique', 'Acides aminés L-form assimilables', 1),
             ('Drip Clean', 'House & Garden', 'chimique', 'Nettoyant préventif magnésium', 1)
         `);
@@ -182,15 +182,15 @@ export class InitNutriments1727721800000 implements MigrationInterface {
             INSERT INTO nutriments (nom, marque, type, description, isPublic) VALUES
             ('Thé de Compost', 'Fait Maison', 'organique', 'Infusion aérée de compost riche en microorganismes', 1),
             ('Thé de Lombricompost', 'Fait Maison', 'organique', 'Infusion de vermicompost microbes bénéfiques', 1),
-            ('Purin d\'Ortie', 'Fait Maison', 'organique', 'Macération ortie azote et minéraux NPK 5-1-1', 1),
+            ('Purin d''Ortie', 'Fait Maison', 'organique', 'Macération ortie azote et minéraux NPK 5-1-1', 1),
             ('Purin de Consoude', 'Fait Maison', 'organique', 'Macération consoude potassium NPK 1-1-5', 1),
             ('Purin de Prêle', 'Fait Maison', 'organique', 'Macération prêle silice fongicide préventif', 1),
             ('Fumier de Poule', 'Biologique', 'organique', 'Fumier composté riche azote NPK 4-2-2', 1),
             ('Fumier de Cheval', 'Biologique', 'organique', 'Fumier composté équilibré NPK 2-1-2', 1),
             ('Guano de Chauve-souris', 'Biologique', 'organique', 'Guano riche phosphore floraison NPK 3-10-1', 1),
-            ('Guano d\'Oiseaux de Mer', 'Biologique', 'organique', 'Guano équilibré complet NPK 12-12-2', 1),
+            ('Guano d''Oiseaux de Mer', 'Biologique', 'organique', 'Guano équilibré complet NPK 12-12-2', 1),
             ('Farine de Sang', 'Biologique', 'organique', 'Azote à libération rapide NPK 12-0-0', 1),
-            ('Farine d\'Os', 'Biologique', 'organique', 'Phosphore à libération lente NPK 4-12-0', 1),
+            ('Farine d''Os', 'Biologique', 'organique', 'Phosphore à libération lente NPK 4-12-0', 1),
             ('Farine de Plumes', 'Biologique', 'organique', 'Azote à libération lente NPK 12-0-0', 1),
             ('Tourteau de Neem', 'Biologique', 'organique', 'Engrais et insecticide naturel NPK 6-1-2', 1),
             ('Tourteau de Ricin', 'Biologique', 'organique', 'Engrais et répulsif ravageurs NPK 6-2-1', 1),
