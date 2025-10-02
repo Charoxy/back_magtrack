@@ -63,7 +63,9 @@ import { TransformationModule } from './transformation/transformation.module';
           LotTransformation,
           LotTransformationSource,
         ],
-          synchronize: true,
+          synchronize: false, // Désactivé - on utilise les migrations SQL
+          migrations: [],
+          migrationsRun: false,
         };
       },
       inject: [ConfigService],
