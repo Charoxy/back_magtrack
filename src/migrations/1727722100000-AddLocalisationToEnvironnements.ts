@@ -2,25 +2,31 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddLocalisationToEnvironnements1727722100000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Ajouter toutes les colonnes manquantes à la table environnements
-        await queryRunner.query(`
-            ALTER TABLE environnements
-            ADD COLUMN IF NOT EXISTS localisation VARCHAR(255) NULL,
-            ADD COLUMN IF NOT EXISTS surface_m2 DECIMAL(6,2) NULL,
-            ADD COLUMN IF NOT EXISTS capacite_max_plants INT NULL,
-            ADD COLUMN IF NOT EXISTS temp_cible_min DECIMAL(4,1) NULL,
-            ADD COLUMN IF NOT EXISTS temp_cible_max DECIMAL(4,1) NULL,
-            ADD COLUMN IF NOT EXISTS humidite_cible_min DECIMAL(4,1) NULL,
-            ADD COLUMN IF NOT EXISTS humidite_cible_max DECIMAL(4,1) NULL,
-            ADD COLUMN IF NOT EXISTS co2_cible_ppm INT NULL,
-            ADD COLUMN IF NOT EXISTS lumiere_watt INT NULL,
-            ADD COLUMN IF NOT EXISTS nombre_ventilateurs TINYINT NULL,
-            ADD COLUMN IF NOT EXISTS photoperiode_jour TINYINT NULL,
-            ADD COLUMN IF NOT EXISTS photoperiode_nuit TINYINT NULL,
-            ADD COLUMN IF NOT EXISTS alertes_activees BOOLEAN DEFAULT FALSE,
-            ADD COLUMN IF NOT EXISTS statut ENUM('actif', 'en maintenance', 'fermé') DEFAULT 'actif',
-            ADD COLUMN IF NOT EXISTS commentaires TEXT NULL
-        `);
+        // Vérifier et ajouter chaque colonne individuellement
+        const columns = [
+            { name: 'localisation', type: 'VARCHAR(255) NULL' },
+            { name: 'surface_m2', type: 'DECIMAL(6,2) NULL' },
+            { name: 'capacite_max_plants', type: 'INT NULL' },
+            { name: 'temp_cible_min', type: 'DECIMAL(4,1) NULL' },
+            { name: 'temp_cible_max', type: 'DECIMAL(4,1) NULL' },
+            { name: 'humidite_cible_min', type: 'DECIMAL(4,1) NULL' },
+            { name: 'humidite_cible_max', type: 'DECIMAL(4,1) NULL' },
+            { name: 'co2_cible_ppm', type: 'INT NULL' },
+            { name: 'lumiere_watt', type: 'INT NULL' },
+            { name: 'nombre_ventilateurs', type: 'TINYINT NULL' },
+            { name: 'photoperiode_jour', type: 'TINYINT NULL' },
+            { name: 'photoperiode_nuit', type: 'TINYINT NULL' },
+            { name: 'alertes_activees', type: 'BOOLEAN DEFAULT FALSE' },
+            { name: 'statut', type: "ENUM('actif', 'en maintenance', 'fermé') DEFAULT 'actif'" },
+            { name: 'commentaires', type: 'TEXT NULL' }
+        ];
+
+        for (const col of columns) {
+            await queryRunner.query(`
+                ALTER TABLE environnements
+                ADD COLUMN IF NOT EXISTS ${col.name} ${col.type}
+            `);
+        }
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
