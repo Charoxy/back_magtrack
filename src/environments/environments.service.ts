@@ -92,7 +92,7 @@ export class EnvironmentsService {
       environment.userId = userId;
       environment.nombre_ventilateurs = env.nombre_ventilateurs;
 
-      return  await this.environmentsRepository.save(env);
+      return  await this.environmentsRepository.save(environment);
   }
 
   async getEnvironmentById(id: number): Promise<Environnement> {
