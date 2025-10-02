@@ -24,7 +24,7 @@ export class AuthController {
       path: '/',
     });
 
-
+    return { success: true, message: 'Connexion réussie' };
   }
 
   @Post('register')

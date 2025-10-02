@@ -26,7 +26,7 @@ export class User {
   @Column({ nullable: true })
   organisation: string;
 
-  @Column({ default: 'producteur' }) // ex: producteur, admin, technicien
+  @Column({ default: 'producteur, non_producteur' }) // ex: producteur, admin, technicien
   role: string;
 
   @OneToMany(() => Lot, (lot) => lot.user)

@@ -29,6 +29,13 @@ export class UsersService {
     newUser.nom = user.nom;
     newUser.organisation = user.organisation;
 
+    // Si isproducteur est défini, on l'assigne, sinon par défaut producteur
+    if (user.isproducteur !== undefined && !user.isproducteur) {
+      newUser.role = 'technicien';
+    } else {
+      newUser.role = 'non_producteur';
+    }
+
     return await this.userRepository.save(newUser);
   }
 
