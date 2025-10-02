@@ -3,7 +3,6 @@ import { Brackets, IsNull, LessThan, LessThanOrEqual, MoreThanOrEqual, Repositor
 import { Environnement } from "../entities/entitie.environements";
 import { EnvironnementLot } from "../entities/entitie.environement-lot";
 import { ConditionEnvironnementale } from "../entities/entitie.condition-environnementale";
-import { environments } from "eslint-plugin-prettier";
 import { InjectRepository } from "@nestjs/typeorm";
 import e from "express";
 import { EnvMake } from "../dto/envmake";
