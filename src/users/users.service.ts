@@ -32,5 +32,18 @@ export class UsersService {
     return await this.userRepository.save(newUser);
   }
 
+  async getProfile(userId: number): Promise<Omit<User, 'password'>> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'email', 'nom', 'organisation', 'role', 'createdAt', 'updatedAt']
+    });
+
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    return user;
+  }
+
 
 }

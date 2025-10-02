@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Request, UseGuards } from "@nestjs/common";
 import { LotsService } from "./lots.service";
 import { CreateLotDto } from "../dto/lotsmake.dto";
 import { AuthGuard } from "../auth/auth.guard";
 import { CreateLotActionDto } from "../dto/create-lot-action.dto";
 import { ChangeEnvDTO } from "../dto/change-env.dto";
 import { CreateShareLots } from "src/dto/create-share-lots";
+import { UpdateLotQuantityDto } from "src/dto/update-lot-quantity.dto";
 
 @UseGuards(AuthGuard)
 @Controller('lots')
@@ -64,6 +65,32 @@ export class LotsController {
   @Post('share-lots')
   makeShareLot(@Request() req, @Body() shareLot: CreateShareLots) {
     return this.lotsService.makeShareLot(shareLot, req.user.sub);
+  }
+
+  @Get('statistics')
+  getStatistics(@Request() req) {
+    return this.lotsService.getStatistics(req.user.sub);
+  }
+
+  @Get('recent-activities')
+  getRecentActivities(@Request() req) {
+    return this.lotsService.getRecentActivities(req.user.sub);
+  }
+
+  @Get('culture-evolution')
+  getCultureEvolution(@Request() req) {
+    return this.lotsService.getCultureEvolution(req.user.sub);
+  }
+
+  @Put(':id/quantity')
+  updateLotQuantity(@Request() req, @Param('id') id: number, @Body() updateQuantityDto: UpdateLotQuantityDto) {
+    return this.lotsService.updateLotQuantity(id, updateQuantityDto.quantite, req.user.sub);
+  }
+
+
+  @Get('maturation')
+  getMaturationLots(@Request() req) {
+    return this.lotsService.getMaturationLots(req.user.sub);
   }
 
 

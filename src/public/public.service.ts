@@ -38,18 +38,57 @@ export class PublicService {
         return await this.shareLotsRepository.findOne({ where: { id : id } }) != null;
     }
 
-      async getPublicLots(id: string): Promise<any> {
+    async getPublicLots(id: string): Promise<any> {
     
-    if(this.isPublicLot(id)){
+        if(this.isPublicLot(id)){
 
-      const sharelots = await this.shareLotsRepository.findOne({ where: { id : id }, relations: ['lot', 'lot.environnements_lots', "lot.actions"] });
-      return {...sharelots.lot};
+        const sharelots = await this.shareLotsRepository.findOne({ where: { id : id }, relations: ['lot', 'lot.environnements_lots'] });
 
-    }
+        let cultureType = null;
 
-    throw new HttpException("Lot non trouvé", HttpStatus.NOT_FOUND);
+        await Promise.all(sharelots.lot.environnements_lots.map(async (envLot) => {
+            const env = await this.environnementRepository.findOne({ where: { id: envLot.environnementId } });
+            envLot.environnement = env;
+
+            if (env.type === 'culture') {
+                if (cultureType == null) {
+                    cultureType = env.culture_type;
+                } else if (cultureType !== env.culture_type) {
+                    cultureType = "Mixte";
+                }
+            }
+        }));
+
+        
+        return {
+            name : sharelots.lot.nom,
+            id : sharelots.lot.id,
+            environnements : sharelots.lot.environnements_lots,
+            variete : sharelots.lot.variete,
+            date_debut : sharelots.lot.dateDebut,
+            date_fin : sharelots.lot.dateFin,
+            culture_type : cultureType
+        }
+
+        }
+
+        throw new HttpException("Lot non trouvé", HttpStatus.NOT_FOUND);
 
   }
+
+    async getStageStartDates(lotid: number): Promise<{ stage: string; date: Date }[]> {
+        // On récupère toutes les actions "stage" d’un lot
+        const actions = await this.lotActionRepository.find({
+            where: { lotId: lotid, type: 'stage' },
+            order: { date: 'ASC' }
+        });
+
+        // On retourne uniquement stage + date
+        return actions.map(action => ({
+            stage: action.stage,
+            date: new Date(action.date) // pour être sûr qu’on a bien un objet Date
+        }));
+    }
 
 
 
@@ -95,16 +134,13 @@ async getMoyenneConditions(id: string): Promise<any> {
             [env[0].environnementId, dateOfStage.toISOString().substring(0, 10), endOfStage.toISOString().substring(0, 10)]
         );
 
-        console.log(dateOfStage.toISOString().substring(0, 10));
-        console.log(endOfStage.toISOString().substring(0, 10));
-
-        console.log(envConditions);
-
         return envConditions.map((condition) => ({
             stage: action.stage,
             temperature: condition.temperature,
             humidite: condition.humidite
         }));
+
+
     }));
 
     // Aplatis les tableaux imbriqués

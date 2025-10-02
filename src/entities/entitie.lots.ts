@@ -41,6 +41,12 @@ export class Lot {
   @Column({nullable: true})
   quantite: number;
 
+  @Column({nullable: true, default: 0})
+  stock: number;
+
+  @Column({ type: 'varchar', length: 50, default: 'flower' })
+  productType: string;
+
   @ManyToOne(() => Variete, (variete) => variete.lots, { eager: true })
   variete: Variete;
 

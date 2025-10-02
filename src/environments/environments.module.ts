@@ -5,9 +5,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Environnement } from "../entities/entitie.environements";
 import { EnvironnementLot } from "../entities/entitie.environement-lot";
 import { ConditionEnvironnementale } from "../entities/entitie.condition-environnementale";
+import { Lot } from "../entities/entitie.lots";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Environnement, EnvironnementLot, ConditionEnvironnementale])],
+  imports: [TypeOrmModule.forFeature([Environnement, EnvironnementLot, ConditionEnvironnementale, Lot])],
   providers: [EnvironmentsService],
   controllers: [EnvironmentsController],
   exports: [EnvironmentsService]

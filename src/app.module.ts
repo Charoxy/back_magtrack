@@ -19,23 +19,32 @@ import { NutrimentsController } from './nutriments/nutriments.controller';
 import { NutrimentsModule } from './nutriments/nutriments.module';
 import { ShareLots } from './entities/entitie.share-lots';
 import { PublicModule } from './public/public.module';
+import { StatsModule } from './stats/stats.module';
+import { ProducerProgress } from './entities/entitie.producer-progress';
+import { ProducerProgressModule } from './producer-progress/producer-progress.module';
+import { StockMovement } from './entities/entitie.stock-movement';
+import { StockModule } from './stock/stock.module';
+import { LotTransformation } from './entities/entitie.lots-transformation';
+import { LotTransformationSource } from './entities/entitie.lots-transformation-sources';
+import { TransformationModule } from './transformation/transformation.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.local',
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      // Ne pas ignorer le fichier .env en production, mais il sera override par les vars système
+      ignoreEnvFile: false,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mariadb',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
+        host: configService.get('DB_HOST') || 'localhost',
+        port: configService.get('DB_PORT') || 3306,
+        username: configService.get('DB_USERNAME') || 'root',
+        password: configService.get('DB_PASSWORD') || 'root',
+        database: configService.get('DB_DATABASE') || 'magtrack',
         entities: [
           ConditionEnvironnementale,
           Environnement,
@@ -47,6 +56,10 @@ import { PublicModule } from './public/public.module';
           Nutriments,
           NutrimentAction,
           ShareLots,
+          ProducerProgress,
+          StockMovement,
+          LotTransformation,
+          LotTransformationSource,
         ],
         synchronize: true,
       }),
@@ -59,6 +72,10 @@ import { PublicModule } from './public/public.module';
     LotsModule,
     NutrimentsModule,
     PublicModule,
+    StatsModule,
+    ProducerProgressModule,
+    StockModule,
+    TransformationModule,
   ],
 })
 
