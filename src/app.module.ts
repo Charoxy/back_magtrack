@@ -37,14 +37,23 @@ import { TransformationModule } from './transformation/transformation.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mariadb',
-        host: configService.get('DB_HOST') || 'localhost',
-        port: configService.get('DB_PORT') || 3306,
-        username: configService.get('DB_USERNAME') || 'root',
-        password: configService.get('DB_PASSWORD') || 'root',
-        database: configService.get('DB_DATABASE') || 'magtrack',
-        entities: [
+      useFactory: (configService: ConfigService) => {
+        // Debug: afficher les variables chargées
+        console.log('DB Config:', {
+          host: configService.get('DB_HOST'),
+          port: configService.get('DB_PORT'),
+          username: configService.get('DB_USERNAME'),
+          database: configService.get('DB_DATABASE'),
+        });
+
+        return {
+          type: 'mariadb',
+          host: configService.get('DB_HOST') || 'localhost',
+          port: configService.get('DB_PORT') || 3306,
+          username: configService.get('DB_USERNAME') || 'root',
+          password: configService.get('DB_PASSWORD') || 'root',
+          database: configService.get('DB_DATABASE') || 'magtrack',
+          entities: [
           ConditionEnvironnementale,
           Environnement,
           EnvironnementLot,
@@ -60,8 +69,9 @@ import { TransformationModule } from './transformation/transformation.module';
           LotTransformation,
           LotTransformationSource,
         ],
-        synchronize: true,
-      }),
+          synchronize: true,
+        };
+      },
       inject: [ConfigService],
     }),
     EnvironmentsModule,
