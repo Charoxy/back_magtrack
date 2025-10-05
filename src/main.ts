@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from "@nestjs/common";
 import * as cookieParser from 'cookie-parser';
 import { GlobalSanitizePipe } from "./pipe/GlobalSanitizePipe";
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   console.log('=== APPLICATION STARTING ===');
@@ -23,6 +24,19 @@ async function bootstrap() {
     credentials: true
   });
   app.useGlobalPipes(new GlobalSanitizePipe());
+
+  // Swagger uniquement en développement
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('MagTrack API')
+      .setDescription('API de gestion de culture de cannabis')
+      .setVersion('1.0')
+      .addCookieAuth('token')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+    console.log('📚 Swagger documentation disponible sur: http://localhost:' + (process.env.PORT || 3000) + '/api');
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
