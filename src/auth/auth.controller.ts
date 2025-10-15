@@ -20,7 +20,7 @@ export class AuthController {
     status: 200,
     description: 'Connexion réussie, cookie JWT défini',
     schema: {
-      example: { success: true, message: 'Connexion réussie' }
+      example: { success: true, message: 'Connexion réussie', email: 'user@example.com' }
     }
   })
   @ApiResponse({ status: 401, description: 'Email ou mot de passe incorrect' })
@@ -35,15 +35,22 @@ export class AuthController {
       path: '/',
     });
 
-    return { success: true, message: 'Connexion réussie' };
+    return { success: true, message: 'Connexion réussie', email: signInDto.email };
   }
 
   @Post('register')
   @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
-  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès' })
+  @ApiResponse({
+    status: 201,
+    description: 'Utilisateur créé avec succès',
+    schema: {
+      example: { access_token: 'jwt_token...', email: 'user@example.com' }
+    }
+  })
   @ApiResponse({ status: 400, description: 'Données invalides ou email déjà utilisé' })
   async register(@Body() userMakeDto: CreateUserDto) {
-    return await this.authService.register(userMakeDto);
+    const result = await this.authService.register(userMakeDto);
+    return { ...result, email: userMakeDto.email };
   }
 
   @UseGuards(AuthGuard)
