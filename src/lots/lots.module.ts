@@ -8,9 +8,12 @@ import { EnvironmentsModule } from "../environments/environments.module";
 import { UsersModule } from 'src/users/users.module';
 import { LotAction } from "../entities/entitie.lots-action";
 import { ShareLots } from 'src/entities/entitie.share-lots';
+import { EnvironnementLot } from 'src/entities/entitie.environement-lot';
+import { ConditionEnvironnementale } from 'src/entities/entitie.condition-environnementale';
+import { PiedMere } from 'src/entities/entitie.pied-mere';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Lot, LotAction, ShareLots]), VarieteModule, EnvironmentsModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([Lot, LotAction, ShareLots, EnvironnementLot, ConditionEnvironnementale, PiedMere]), VarieteModule, EnvironmentsModule, UsersModule],
   controllers: [LotsController],
   providers: [LotsService]
 })

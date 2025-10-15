@@ -14,6 +14,9 @@ import { ProducerProgress } from '../entities/entitie.producer-progress';
 import { StockMovement } from '../entities/entitie.stock-movement';
 import { LotTransformation } from '../entities/entitie.lots-transformation';
 import { LotTransformationSource } from '../entities/entitie.lots-transformation-sources';
+import { Media } from '../entities/entitie.media';
+import { PiedMere } from '../entities/entitie.pied-mere';
+import { EvaluationPlant } from '../entities/entitie.evaluation-plant';
 
 // Charger les variables d'environnement
 config({ path: '.env.local' });
@@ -40,6 +43,9 @@ export const AppDataSource = new DataSource({
     StockMovement,
     LotTransformation,
     LotTransformationSource,
+    Media,
+    PiedMere,
+    EvaluationPlant,
   ],
   migrations: [__dirname + '/../migrations/*.{ts,js}'],
   migrationsTableName: 'typeorm_migrations',

@@ -8,7 +8,10 @@ export class GlobalSanitizePipe implements PipeTransform {
   async transform(value: any, { metatype }: ArgumentMetadata) {
     if (!metatype || !this.toValidate(metatype)) return value;
 
-    const object = plainToInstance(metatype, value);
+    const object = plainToInstance(metatype, value, {
+      enableImplicitConversion: true, // Active la conversion implicite
+      exposeDefaultValues: true,
+    });
 
     // Applique la sanitisation globale
     sanitize(object);

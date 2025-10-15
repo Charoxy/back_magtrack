@@ -59,7 +59,7 @@ export class PublicService {
             }
         }));
 
-        
+
         return {
             name : sharelots.lot.nom,
             id : sharelots.lot.id,
@@ -67,7 +67,8 @@ export class PublicService {
             variete : sharelots.lot.variete,
             date_debut : sharelots.lot.dateDebut,
             date_fin : sharelots.lot.dateFin,
-            culture_type : cultureType
+            culture_type : cultureType,
+            substrat : sharelots.lot.substrat
         }
 
         }

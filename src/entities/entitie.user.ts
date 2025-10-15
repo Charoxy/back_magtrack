@@ -29,6 +29,9 @@ export class User {
   @Column({ default: 'producteur, non_producteur' }) // ex: producteur, admin, technicien
   role: string;
 
+  @Column({ type: 'boolean', default: false })
+  onboardingCompleted: boolean;
+
   @OneToMany(() => Lot, (lot) => lot.user)
   lots: Lot[];
 

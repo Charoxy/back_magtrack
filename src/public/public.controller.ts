@@ -19,11 +19,39 @@ export class PublicController {
         description: 'Informations publiques du lot',
         schema: {
             example: {
-                nom: 'Purple Haze #1',
-                variete: 'Purple Haze',
-                etapeCulture: 'Floraison',
-                dateDebut: '2024-01-15',
-                planteQuantite: 10
+                name: 'Purple Haze #1',
+                id: 1,
+                environnements: [
+                    {
+                        id: 1,
+                        lotId: 1,
+                        environnementId: 1,
+                        etape: 'culture',
+                        date_entree: '2024-01-15',
+                        date_sortie: null,
+                        environnement: {
+                            id: 1,
+                            nom: 'Serre A - Indoor',
+                            type: 'culture',
+                            localisation: 'Bâtiment Nord',
+                            surface_m2: '50',
+                            culture_type: 'Hydroponie'
+                        }
+                    }
+                ],
+                variete: {
+                    id: 1,
+                    nom: 'Purple Haze',
+                    type: 'Indica',
+                    indica: 80,
+                    sativa: 20,
+                    thc: 18.5,
+                    cbd: 0.5
+                },
+                date_debut: '2024-01-15',
+                date_fin: null,
+                culture_type: 'Hydroponie',
+                substrat: 'coco'
             }
         }
     })

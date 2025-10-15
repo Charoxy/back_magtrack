@@ -42,7 +42,7 @@ export class UsersService {
   async getProfile(userId: number): Promise<Omit<User, 'password'>> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'nom', 'organisation', 'role', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'nom', 'organisation', 'role', 'createdAt', 'updatedAt', 'onboardingCompleted']
     });
 
     if (!user) {
@@ -50,6 +50,27 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async getOnboardingStatus(userId: number): Promise<{ onboardingCompleted: boolean }> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['onboardingCompleted']
+    });
+
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    return { onboardingCompleted: user.onboardingCompleted };
+  }
+
+  async completeOnboarding(userId: number): Promise<{ onboardingCompleted: boolean }> {
+    await this.userRepository.update(userId, {
+      onboardingCompleted: true
+    });
+
+    return { onboardingCompleted: true };
   }
 
 

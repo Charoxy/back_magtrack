@@ -6,6 +6,7 @@ import { CreateLotDto } from "../dto/lotsmake.dto";
 import { VarieteService } from "../variete/variete.service";
 import { EnvironmentsService } from 'src/environments/environments.service';
 import { EnvironnementLot } from "../entities/entitie.environement-lot";
+import { ConditionEnvironnementale } from "../entities/entitie.condition-environnementale";
 import { UsersService } from "../users/users.service";
 import { LotAction } from "../entities/entitie.lots-action";
 import { CreateLotActionDto } from "../dto/create-lot-action.dto";
@@ -14,6 +15,8 @@ import { ChangeEnvDTO } from "../dto/change-env.dto";
 import { ShareLots } from "src/entities/entitie.share-lots";
 import { CreateShareLots } from "src/dto/create-share-lots";
 import { link } from "fs";
+import { PrelevementClonesTestDto, CreateLotFromMotherDto } from "../dto/prelevement-clones-test.dto";
+import { PiedMere } from "../entities/entitie.pied-mere";
 
 @Injectable()
 export class LotsService {
@@ -28,6 +31,14 @@ export class LotsService {
     @InjectRepository(ShareLots)
     private readonly shareLotsRepository: Repository<ShareLots>,
 
+    @InjectRepository(EnvironnementLot)
+    private readonly environnementLotRepository: Repository<EnvironnementLot>,
+
+    @InjectRepository(ConditionEnvironnementale)
+    private readonly conditionEnvironnementaleRepository: Repository<ConditionEnvironnementale>,
+
+    @InjectRepository(PiedMere)
+    private readonly piedMereRepository: Repository<PiedMere>,
 
     private varieteService: VarieteService,
     private environementService: EnvironmentsService,
@@ -96,8 +107,17 @@ export class LotsService {
         await this.lotRepository.update(actionToSave.lotId, {
           etapeCulture: action.stage,
           dateFin: new Date(action.date),
-          quantite: action.quantity // Sauvegarder la quantité récoltée
+          quantite: action.quantity, // Sauvegarder la quantité récoltée
+          stock: action.quantity // Le stock initial = quantité récoltée
         });
+
+        // Si c'est un lot de graines qui passe en maturation et qu'il a des clones test,
+        // marquer le lot de clones test comme prêt pour évaluation
+        if(lot.origine === 'graine' && lot.clonesTestCrees && lot.lotClonesTestId){
+          await this.lotRepository.update(lot.lotClonesTestId, {
+            enAttenteSelection: true
+          });
+        }
 
       }else{
 
@@ -117,7 +137,7 @@ export class LotsService {
       environmentLot.lotId = actionToSave.lotId;
       environmentLot.environnementId = action.NewEnv;
       environmentLot.etape = etape;
-      environmentLot.date_entree = action.date;
+      environmentLot.date_entree = new Date(action.date).toISOString().substring(0, 10);
       environmentLot.date_sortie = null;
       environmentLot.commentaire = null;
       await this.environementService.makeEnvironmentLot(environmentLot, userId);
@@ -151,6 +171,28 @@ export class LotsService {
 
 
   async createLot(lot: CreateLotDto, userid:number) {
+    // Si origine = clone_production, vérifier le pied mère
+    if (lot.origine === 'clone_production') {
+      if (!lot.piedMereId) {
+        throw new HttpException('piedMereId est requis pour créer un lot de clones de production', HttpStatus.BAD_REQUEST);
+      }
+
+      const piedMere = await this.piedMereRepository.findOne({
+        where: { id: lot.piedMereId },
+      });
+
+      if (!piedMere) {
+        throw new NotFoundException(`Pied mère avec l'ID ${lot.piedMereId} introuvable`);
+      }
+
+      if (piedMere.userId !== userid) {
+        throw new ForbiddenException('Accès non autorisé à ce pied mère');
+      }
+
+      if (piedMere.statut !== 'actif') {
+        throw new HttpException('Le pied mère doit être actif pour créer des lots', HttpStatus.BAD_REQUEST);
+      }
+    }
 
     let newLot = new Lot();
     newLot.userId = userid
@@ -159,6 +201,11 @@ export class LotsService {
     newLot.dateDebut = new Date(String(lot.dateDebut));
     newLot.variete = await this.varieteService.getVarieteById(lot.varietyId);
     newLot.planteQuantite = lot.PlanteQuantite;
+    newLot.substrat = lot.substrat || null;
+    newLot.origine = lot.origine || 'graine';
+    newLot.piedMereId = lot.piedMereId || null;
+    newLot.generation = lot.origine === 'clone_production' ? 1 : 0;
+
     const lots = await this.lotRepository.save(newLot);
 
     let newEnvLot = new EnvironnementLot();
@@ -170,6 +217,17 @@ export class LotsService {
     newEnvLot.commentaire = null;
 
     await this.environementService.makeEnvironmentLot(newEnvLot, userid)
+
+    // Update mother plant stats if applicable
+    if (lot.origine === 'clone_production' && lot.piedMereId) {
+      const piedMere = await this.piedMereRepository.findOne({
+        where: { id: lot.piedMereId },
+      });
+      await this.piedMereRepository.update(lot.piedMereId, {
+        nombreClonesPrelevés: piedMere.nombreClonesPrelevés + lot.PlanteQuantite,
+        dernierPrelevement: new Date(),
+      });
+    }
 
     return lots;
 
@@ -492,5 +550,330 @@ export class LotsService {
     }));
   }
 
+  async getAverageConditionsByStage(lotId: number, userId: number): Promise<any[]> {
+    // Vérifier que le lot appartient à l'utilisateur
+    const lot = await this.lotRepository.findOne({ where: { id: lotId, userId: userId } });
+
+    if (!lot) {
+      throw new NotFoundException("Lot non trouvé ou accès refusé");
+    }
+
+    // Récupérer toutes les actions de changement de stade
+    const actions = await this.lotActionRepository.find({
+      where: { lotId: lotId, type: 'stage' },
+      order: { date: 'ASC' }
+    });
+
+    const result = await Promise.all(actions.map(async (action, index) => {
+      const dateOfStage = new Date(action.date);
+      const endOfStage = index + 1 >= actions.length
+        ? new Date()
+        : new Date(actions[index + 1].date);
+
+      // Trouver l'environnement du lot à cette date
+      let env = await this.environnementLotRepository.query(
+        `SELECT * FROM environnements_lots e WHERE e.lotId = ? AND e.date_entree = ? LIMIT 1`,
+        [lotId, dateOfStage.toISOString().substring(0, 10)]
+      );
+
+      if (env.length === 0) {
+        env = await this.environnementLotRepository.query(
+          `SELECT * FROM environnements_lots e WHERE e.lotId = ? Order by e.date_entree DESC LIMIT 1`,
+          [lotId]
+        );
+      }
+
+      if (env.length === 0) {
+        return null;
+      }
+
+      // Calculer les moyennes des conditions pour ce stade
+      const envConditions = await this.conditionEnvironnementaleRepository.query(
+        `SELECT AVG(temperature) as temperature, AVG(humidite) as humidite
+        FROM conditions_environnementales c
+        WHERE c.environnementId = ?
+        AND DATE(c.date_heure) >= ?
+        AND DATE(c.date_heure) <= ?
+        ORDER BY c.date_heure ASC`,
+        [env[0].environnementId, dateOfStage.toISOString().substring(0, 10), endOfStage.toISOString().substring(0, 10)]
+      );
+
+      if (envConditions.length > 0 && envConditions[0].temperature !== null) {
+        return {
+          stage: action.stage,
+          temperature: parseFloat(envConditions[0].temperature),
+          humidite: parseFloat(envConditions[0].humidite)
+        };
+      }
+
+      return null;
+    }));
+
+    // Filtrer les résultats null et aplatir
+    return result.filter(r => r !== null);
+  }
+
+  async getStageStartDates(lotId: number, userId: number): Promise<{ stage: string; date: Date }[]> {
+    // Vérifier que le lot appartient à l'utilisateur
+    const lot = await this.lotRepository.findOne({ where: { id: lotId, userId: userId } });
+
+    if (!lot) {
+      throw new NotFoundException("Lot non trouvé ou accès refusé");
+    }
+
+    // Récupérer toutes les actions "stage" du lot
+    const actions = await this.lotActionRepository.find({
+      where: { lotId: lotId, type: 'stage' },
+      order: { date: 'ASC' }
+    });
+
+    // Retourner uniquement stage + date
+    return actions.map(action => ({
+      stage: action.stage,
+      date: new Date(action.date)
+    }));
+  }
+
+  async getEnvironmentHistory(lotId: number, userId: number): Promise<any[]> {
+    // Vérifier que le lot appartient à l'utilisateur
+    const lot = await this.lotRepository.findOne({ where: { id: lotId, userId: userId } });
+    if (!lot) {
+      throw new NotFoundException("Lot non trouvé ou accès refusé");
+    }
+
+    // Récupérer tous les environnements associés au lot, triés par date d'entrée
+    const environnementLots = await this.environnementLotRepository.find({
+      where: { lotId: lotId },
+      relations: ['environnement'],
+      order: { date_entree: 'ASC' }
+    });
+
+    // Récupérer toutes les actions de changement de stade pour mapper les stades aux périodes
+    const stageActions = await this.lotActionRepository.find({
+      where: { lotId: lotId, type: 'stage' },
+      order: { date: 'ASC' }
+    });
+
+    const result = [];
+
+    for (const envLot of environnementLots) {
+      const dateDebut = new Date(envLot.date_entree);
+      const dateFin = envLot.date_sortie ? new Date(envLot.date_sortie) : null;
+
+      // Trouver tous les changements de stade qui se sont produits pendant cette période d'environnement
+      const stagesInThisEnv = stageActions.filter(action => {
+        const actionDate = new Date(action.date);
+        const isAfterStart = actionDate >= dateDebut;
+        const isBeforeEnd = dateFin ? actionDate < dateFin : true;
+        return isAfterStart && isBeforeEnd;
+      });
+
+      // Si aucun stade trouvé pendant cette période, utiliser l'étape de l'environnement
+      if (stagesInThisEnv.length === 0) {
+        const dureeJours = dateFin
+          ? Math.floor((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24))
+          : Math.floor((new Date().getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24));
+
+        result.push({
+          environment: {
+            id: envLot.environnement.id,
+            nom: envLot.environnement.nom,
+            type: envLot.environnement.type,
+            localisation: envLot.environnement.localisation,
+            surface_m2: envLot.environnement.surface_m2,
+            culture_type: envLot.environnement.culture_type
+          },
+          stage: envLot.etape,
+          dateDebut: dateDebut,
+          dateFin: dateFin,
+          dureeJours: dureeJours
+        });
+      } else {
+        // Créer une entrée pour chaque stade dans cet environnement
+        for (let i = 0; i < stagesInThisEnv.length; i++) {
+          const stageAction = stagesInThisEnv[i];
+          const stageDebut = new Date(stageAction.date);
+
+          // La fin du stade est soit le début du prochain stade, soit la sortie de l'environnement
+          let stageFin: Date | null;
+          if (i + 1 < stagesInThisEnv.length) {
+            stageFin = new Date(stagesInThisEnv[i + 1].date);
+          } else {
+            stageFin = dateFin;
+          }
+
+          const dureeJours = stageFin
+            ? Math.floor((stageFin.getTime() - stageDebut.getTime()) / (1000 * 60 * 60 * 24))
+            : Math.floor((new Date().getTime() - stageDebut.getTime()) / (1000 * 60 * 60 * 24));
+
+          result.push({
+            environment: {
+              id: envLot.environnement.id,
+              nom: envLot.environnement.nom,
+              type: envLot.environnement.type,
+              localisation: envLot.environnement.localisation,
+              surface_m2: envLot.environnement.surface_m2,
+              culture_type: envLot.environnement.culture_type
+            },
+            stage: stageAction.stage,
+            dateDebut: stageDebut,
+            dateFin: stageFin,
+            dureeJours: dureeJours
+          });
+        }
+      }
+    }
+
+    return result;
+  }
+
+  async prelevementClonesTest(dto: PrelevementClonesTestDto, userId: number): Promise<Lot> {
+    // Verify ownership of parent seed lot
+    const lotGraines = await this.lotRepository.findOne({
+      where: { id: dto.lotGrainesId },
+      relations: ['variete'],
+    });
+
+    if (!lotGraines) {
+      throw new NotFoundException(`Lot de graines avec l'ID ${dto.lotGrainesId} introuvable`);
+    }
+
+    if (lotGraines.userId !== userId) {
+      throw new ForbiddenException('Accès non autorisé à ce lot');
+    }
+
+    if (lotGraines.origine !== 'graine') {
+      throw new HttpException('Le prélèvement de clones test ne peut se faire que sur des lots de graines', HttpStatus.BAD_REQUEST);
+    }
+
+    if (lotGraines.clonesTestCrees) {
+      throw new HttpException('Un lot de clones test a déjà été créé pour ce lot de graines', HttpStatus.BAD_REQUEST);
+    }
+
+    // Create clone test lot
+    const newLot = new Lot();
+    newLot.userId = userId;
+    newLot.nom = dto.nom;
+    newLot.description = dto.description || `Clones test issus de ${lotGraines.nom}`;
+    newLot.dateDebut = new Date(dto.dateDebut);
+    newLot.variete = lotGraines.variete;
+    newLot.planteQuantite = dto.nombreClones;
+    newLot.substrat = dto.substrat || null;
+    newLot.origine = 'clone_test';
+    newLot.lotParentGrainesId = dto.lotGrainesId;
+    newLot.enAttenteSelection = true;
+    newLot.generation = 1;
+    newLot.etapeCulture = 'Croissance'; // Définir explicitement le stage à Croissance
+
+    const savedLot = await this.lotRepository.save(newLot);
+
+    // Create environment link
+    const newEnvLot = new EnvironnementLot();
+    newEnvLot.lotId = savedLot.id;
+    newEnvLot.environnementId = dto.environmentId;
+    newEnvLot.etape = 'culture';
+    newEnvLot.date_entree = new Date(dto.dateDebut).toISOString().substring(0, 10);
+    newEnvLot.date_sortie = null;
+    newEnvLot.commentaire = `Prélèvement de ${dto.nombreClones} clones test depuis ${lotGraines.nom}`;
+
+    await this.environementService.makeEnvironmentLot(newEnvLot, userId);
+
+    // Créer une action de stage pour marquer le début de la croissance
+    const stageAction = new LotAction();
+    stageAction.lotId = savedLot.id;
+    stageAction.type = 'stage';
+    stageAction.description = 'Début de la phase de croissance';
+    stageAction.date = new Date(dto.dateDebut);
+    stageAction.stage = 'Croissance';
+    await this.lotActionRepository.save(stageAction);
+
+    // Créer une action pour historique du prélèvement
+    const prelevementAction = new LotAction();
+    prelevementAction.lotId = savedLot.id;
+    prelevementAction.type = 'prelevement_clones';
+    prelevementAction.description = `Prélèvement de ${dto.nombreClones} clones test depuis le lot ${lotGraines.nom}`;
+    prelevementAction.date = new Date(dto.dateDebut);
+    await this.lotActionRepository.save(prelevementAction);
+
+    // Update parent lot
+    await this.lotRepository.update(dto.lotGrainesId, {
+      clonesTestCrees: true,
+      lotClonesTestId: savedLot.id,
+    });
+
+    return savedLot;
+  }
+
+  async createFromMother(dto: CreateLotFromMotherDto, userId: number): Promise<Lot> {
+    // Verify mother plant ownership
+    const piedMere = await this.piedMereRepository.findOne({
+      where: { id: dto.piedMereId },
+      relations: ['variete'],
+    });
+
+    if (!piedMere) {
+      throw new NotFoundException(`Pied mère avec l'ID ${dto.piedMereId} introuvable`);
+    }
+
+    if (piedMere.userId !== userId) {
+      throw new ForbiddenException('Accès non autorisé à ce pied mère');
+    }
+
+    if (piedMere.statut !== 'actif') {
+      throw new HttpException('Le pied mère doit être actif pour prélever des clones', HttpStatus.BAD_REQUEST);
+    }
+
+    // Create production clone lot
+    const newLot = new Lot();
+    newLot.userId = userId;
+    newLot.nom = dto.nom;
+    newLot.description = dto.description || `Clones de production issus du pied mère ${piedMere.nom} (${piedMere.code})`;
+    newLot.dateDebut = new Date(dto.dateDebut);
+    newLot.variete = piedMere.variete;
+    newLot.planteQuantite = dto.nombreClones;
+    newLot.substrat = dto.substrat || null;
+    newLot.origine = 'clone_production';
+    newLot.piedMereId = dto.piedMereId;
+    newLot.generation = piedMere.generation + 1;
+    newLot.etapeCulture = 'Croissance'; // Définir explicitement le stage à Croissance
+
+    const savedLot = await this.lotRepository.save(newLot);
+
+    // Create environment link
+    const newEnvLot = new EnvironnementLot();
+    newEnvLot.lotId = savedLot.id;
+    newEnvLot.environnementId = dto.environmentId;
+    newEnvLot.etape = 'culture';
+    newEnvLot.date_entree = new Date(dto.dateDebut).toISOString().substring(0, 10);
+    newEnvLot.date_sortie = null;
+    newEnvLot.commentaire = `Prélèvement de ${dto.nombreClones} clones de production depuis le pied mère ${piedMere.code}`;
+
+    await this.environementService.makeEnvironmentLot(newEnvLot, userId);
+
+    // Créer une action de stage pour marquer le début de la croissance
+    const stageAction = new LotAction();
+    stageAction.lotId = savedLot.id;
+    stageAction.type = 'stage';
+    stageAction.description = 'Début de la phase de croissance';
+    stageAction.date = new Date(dto.dateDebut);
+    stageAction.stage = 'Croissance';
+    await this.lotActionRepository.save(stageAction);
+
+    // Créer une action pour historique du prélèvement
+    const prelevementAction = new LotAction();
+    prelevementAction.lotId = savedLot.id;
+    prelevementAction.type = 'prelevement_clones';
+    prelevementAction.description = `Prélèvement de ${dto.nombreClones} clones de production depuis le pied mère ${piedMere.nom} (${piedMere.code})`;
+    prelevementAction.date = new Date(dto.dateDebut);
+    await this.lotActionRepository.save(prelevementAction);
+
+    // Update mother plant stats
+    await this.piedMereRepository.update(dto.piedMereId, {
+      nombreClonesPrelevés: piedMere.nombreClonesPrelevés + dto.nombreClones,
+      dernierPrelevement: new Date(),
+    });
+
+    return savedLot;
+  }
 
 }

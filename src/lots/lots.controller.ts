@@ -7,6 +7,7 @@ import { CreateLotActionDto } from "../dto/create-lot-action.dto";
 import { ChangeEnvDTO } from "../dto/change-env.dto";
 import { CreateShareLots } from "src/dto/create-share-lots";
 import { UpdateLotQuantityDto } from "src/dto/update-lot-quantity.dto";
+import { PrelevementClonesTestDto, CreateLotFromMotherDto } from "../dto/prelevement-clones-test.dto";
 
 @ApiTags('Lots')
 @ApiCookieAuth()
@@ -195,5 +196,147 @@ export class LotsController {
     return this.lotsService.getMaturationLots(req.user.sub);
   }
 
+  @Get(':id/average-conditions-by-stage')
+  @ApiOperation({ summary: 'Récupérer les conditions moyennes par stade de culture' })
+  @ApiParam({ name: 'id', description: 'ID du lot' })
+  @ApiResponse({
+    status: 200,
+    description: 'Conditions moyennes par stade',
+    schema: {
+      example: [
+        { stage: 'semi', temperature: 22.5, humidite: 65.3 },
+        { stage: 'croissance', temperature: 24.2, humidite: 60.8 },
+        { stage: 'floraison', temperature: 23.1, humidite: 55.2 }
+      ]
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Lot non trouvé ou accès refusé' })
+  getAverageConditionsByStage(@Request() req, @Param('id') id: number) {
+    return this.lotsService.getAverageConditionsByStage(id, req.user.sub);
+  }
+
+  @Get(':id/stage-start-dates')
+  @ApiOperation({ summary: 'Récupérer les dates de début de chaque stade de culture' })
+  @ApiParam({ name: 'id', description: 'ID du lot' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dates de début par stade',
+    schema: {
+      example: [
+        { stage: 'semi', date: '2024-01-15T10:00:00.000Z' },
+        { stage: 'croissance', date: '2024-01-22T09:30:00.000Z' },
+        { stage: 'floraison', date: '2024-03-01T14:20:00.000Z' }
+      ]
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Lot non trouvé ou accès refusé' })
+  getStageStartDates(@Request() req, @Param('id') id: number) {
+    return this.lotsService.getStageStartDates(id, req.user.sub);
+  }
+
+  @Get(':id/environment-history')
+  @ApiOperation({ summary: 'Récupérer l\'historique complet des environnements de culture' })
+  @ApiParam({ name: 'id', description: 'ID du lot' })
+  @ApiResponse({
+    status: 200,
+    description: 'Historique des environnements avec stades et durées',
+    schema: {
+      example: [
+        {
+          environment: {
+            id: 1,
+            nom: 'Serre A - Indoor',
+            type: 'Indoor',
+            localisation: 'Bâtiment Nord',
+            surface_m2: '50',
+            culture_type: 'Hydroponie'
+          },
+          stage: 'semi',
+          dateDebut: '2024-01-15T10:00:00.000Z',
+          dateFin: '2024-01-22T09:30:00.000Z',
+          dureeJours: 7
+        },
+        {
+          environment: {
+            id: 1,
+            nom: 'Serre A - Indoor',
+            type: 'Indoor',
+            localisation: 'Bâtiment Nord',
+            surface_m2: '50',
+            culture_type: 'Hydroponie'
+          },
+          stage: 'croissance',
+          dateDebut: '2024-01-22T09:30:00.000Z',
+          dateFin: '2024-03-01T14:20:00.000Z',
+          dureeJours: 39
+        },
+        {
+          environment: {
+            id: 2,
+            nom: 'Serre B - Floraison',
+            type: 'Indoor',
+            localisation: 'Bâtiment Sud',
+            surface_m2: '75',
+            culture_type: 'Terre'
+          },
+          stage: 'floraison',
+          dateDebut: '2024-03-01T14:20:00.000Z',
+          dateFin: null,
+          dureeJours: 45
+        }
+      ]
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Lot non trouvé ou accès refusé' })
+  getEnvironmentHistory(@Request() req, @Param('id') id: number) {
+    return this.lotsService.getEnvironmentHistory(id, req.user.sub);
+  }
+
+  @Post('prelevement-clones-test')
+  @ApiOperation({ summary: 'Créer un lot de clones test à partir d\'une plante d\'un lot de graines' })
+  @ApiResponse({
+    status: 201,
+    description: 'Lot de clones test créé avec succès',
+    schema: {
+      example: {
+        id: 15,
+        nom: 'Clones Test - Purple Haze #1',
+        origine: 'clone_test',
+        lotParentGrainesId: 8,
+        planteQuantite: 16,
+        enAttenteSelection: true,
+        generation: 1
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: 'Données invalides ou lot parent incorrect' })
+  @ApiResponse({ status: 403, description: 'Accès non autorisé' })
+  @ApiResponse({ status: 404, description: 'Lot de graines introuvable' })
+  prelevementClonesTest(@Request() req, @Body() dto: PrelevementClonesTestDto) {
+    return this.lotsService.prelevementClonesTest(dto, req.user.sub);
+  }
+
+  @Post('from-mother')
+  @ApiOperation({ summary: 'Créer un lot de production à partir d\'un pied mère' })
+  @ApiResponse({
+    status: 201,
+    description: 'Lot de production créé avec succès',
+    schema: {
+      example: {
+        id: 20,
+        nom: 'Production - PM-001',
+        origine: 'clone_production',
+        piedMereId: 5,
+        planteQuantite: 50,
+        generation: 2
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: 'Données invalides ou pied mère inactif' })
+  @ApiResponse({ status: 403, description: 'Accès non autorisé' })
+  @ApiResponse({ status: 404, description: 'Pied mère introuvable' })
+  createFromMother(@Request() req, @Body() dto: CreateLotFromMotherDto) {
+    return this.lotsService.createFromMother(dto, req.user.sub);
+  }
 
 }

@@ -27,6 +27,12 @@ import { StockModule } from './stock/stock.module';
 import { LotTransformation } from './entities/entitie.lots-transformation';
 import { LotTransformationSource } from './entities/entitie.lots-transformation-sources';
 import { TransformationModule } from './transformation/transformation.module';
+import { Media } from './entities/entitie.media';
+import { MediaModule } from './media/media.module';
+import { PiedMere } from './entities/entitie.pied-mere';
+import { EvaluationPlant } from './entities/entitie.evaluation-plant';
+import { PiedsMeresModule } from './pieds-meres/pieds-meres.module';
+import { EvaluationsModule } from './evaluations/evaluations.module';
 
 @Module({
   imports: [
@@ -62,6 +68,9 @@ import { TransformationModule } from './transformation/transformation.module';
           StockMovement,
           LotTransformation,
           LotTransformationSource,
+          Media,
+          PiedMere,
+          EvaluationPlant,
         ],
           synchronize: false, // Désactivé - on utilise les migrations SQL
           migrations: [],
@@ -81,6 +90,9 @@ import { TransformationModule } from './transformation/transformation.module';
     ProducerProgressModule,
     StockModule,
     TransformationModule,
+    MediaModule,
+    PiedsMeresModule,
+    EvaluationsModule,
   ],
 })
 
