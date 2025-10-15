@@ -650,7 +650,7 @@
   "resolved" "https://registry.npmjs.org/@lukeed/csprng/-/csprng-1.1.0.tgz"
   "version" "1.1.0"
 
-"@microsoft/tsdoc@0.15.1":
+"@microsoft/tsdoc@^0.15.0":
   "integrity" "sha512-4aErSrCR/On/e5G2hDP0wjooqDdauzEbIq8hIkIe5pXV0rtWJZvdCEKL0ykZxex+IxIwBp0eGeV48hQN07dXtw=="
   "resolved" "https://registry.npmjs.org/@microsoft/tsdoc/-/tsdoc-0.15.1.tgz"
   "version" "0.15.1"
@@ -680,7 +680,7 @@
     "webpack" "5.97.1"
     "webpack-node-externals" "3.0.0"
 
-"@nestjs/common@^10.0.0", "@nestjs/common@^10.0.0 || ^11.0.0", "@nestjs/common@^11.0.1", "@nestjs/common@^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0":
+"@nestjs/common@^10.0.0", "@nestjs/common@^10.0.0 || ^11.0.0", "@nestjs/common@^8.0.0 || ^9.0.0 || ^10.0.0", "@nestjs/common@^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0", "@nestjs/common@^9.0.0 || ^10.0.0":
   "integrity" "sha512-0TZJ8H+7qtaqZt6YfZJkDRp0e+v6jjo5/pevPAjUy0WYxaTy16bNNQxFPRKLMe/v1hUr2oGV9imvL2477zNt5g=="
   "resolved" "https://registry.npmjs.org/@nestjs/common/-/common-10.4.19.tgz"
   "version" "10.4.19"
@@ -699,7 +699,7 @@
     "dotenv-expand" "12.0.1"
     "lodash" "4.17.21"
 
-"@nestjs/core@^10.0.0", "@nestjs/core@^10.0.0 || ^11.0.0", "@nestjs/core@^11.0.1":
+"@nestjs/core@^10.0.0", "@nestjs/core@^10.0.0 || ^11.0.0", "@nestjs/core@^9.0.0 || ^10.0.0":
   "integrity" "sha512-gahghu0y4Rn4gn/xPjTgNHFMpUM8TxfhdeMowVWTGVnYMZtGeEGbIXMFhJS0Dce3E4VKyqAglzgO9ecAZd4Ong=="
   "resolved" "https://registry.npmjs.org/@nestjs/core/-/core-10.4.19.tgz"
   "version" "10.4.19"
@@ -719,10 +719,10 @@
     "@types/jsonwebtoken" "9.0.7"
     "jsonwebtoken" "9.0.2"
 
-"@nestjs/mapped-types@2.1.0":
-  "integrity" "sha512-W+n+rM69XsFdwORF11UqJahn4J3xi4g/ZEOlJNL6KoW5ygWSmBB2p0S2BZ4FQeS/NDH72e6xIcu35SfJnE8bXw=="
-  "resolved" "https://registry.npmjs.org/@nestjs/mapped-types/-/mapped-types-2.1.0.tgz"
-  "version" "2.1.0"
+"@nestjs/mapped-types@2.0.5":
+  "integrity" "sha512-bSJv4pd6EY99NX9CjBIyn4TVDoSit82DUZlL4I3bqNfy5Gt+gXTa86i3I/i0iIV9P4hntcGM5GyO+FhZAhxtyg=="
+  "resolved" "https://registry.npmjs.org/@nestjs/mapped-types/-/mapped-types-2.0.5.tgz"
+  "version" "2.0.5"
 
 "@nestjs/platform-express@^10.0.0":
   "integrity" "sha512-IeQkBZUtPeJoO4E0QqSLwkB+60KcThw8/s4gGvAwIRJ5ViuXoxnwU59eBDy84PUuVbNe4VdKjfAF9fuQOEh11Q=="
@@ -746,17 +746,17 @@
     "jsonc-parser" "3.3.1"
     "pluralize" "8.0.0"
 
-"@nestjs/swagger@^11.2.0":
-  "integrity" "sha512-5wolt8GmpNcrQv34tIPUtPoV1EeFbCetm40Ij3+M0FNNnf2RJ3FyWfuQvI8SBlcJyfaounYVTKzKHreFXsUyOg=="
-  "resolved" "https://registry.npmjs.org/@nestjs/swagger/-/swagger-11.2.0.tgz"
-  "version" "11.2.0"
+"@nestjs/swagger@^7.4.2":
+  "integrity" "sha512-Mu6TEn1M/owIvAx2B4DUQObQXqo2028R2s9rSZ/hJEgBK95+doTwS0DjmVA2wTeZTyVtXOoN7CsoM5pONBzvKQ=="
+  "resolved" "https://registry.npmjs.org/@nestjs/swagger/-/swagger-7.4.2.tgz"
+  "version" "7.4.2"
   dependencies:
-    "@microsoft/tsdoc" "0.15.1"
-    "@nestjs/mapped-types" "2.1.0"
+    "@microsoft/tsdoc" "^0.15.0"
+    "@nestjs/mapped-types" "2.0.5"
     "js-yaml" "4.1.0"
     "lodash" "4.17.21"
-    "path-to-regexp" "8.2.0"
-    "swagger-ui-dist" "5.21.0"
+    "path-to-regexp" "3.3.0"
+    "swagger-ui-dist" "5.17.14"
 
 "@nestjs/testing@^10.0.0":
   "integrity" "sha512-YfzkjTmwEcoWqo8xr8YiTZMC4FjBEOg4uRTAPI2p6iGLWu+27tYau1CtAKFHY0uSAK3FzgtsAuYoxBSlfr9mWA=="
@@ -821,11 +821,6 @@
   "integrity" "sha512-YLT9Zo3oNPJoBjBc4q8G2mjU4tqIbf5CEOORbUUr48dCD9q3umJ3IPlVqOqDakPfd2HuwccBaqlGhN4Gmr5OWg=="
   "resolved" "https://registry.npmjs.org/@pkgr/core/-/core-0.2.7.tgz"
   "version" "0.2.7"
-
-"@scarf/scarf@=1.4.0":
-  "integrity" "sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ=="
-  "resolved" "https://registry.npmjs.org/@scarf/scarf/-/scarf-1.4.0.tgz"
-  "version" "1.4.0"
 
 "@sinclair/typebox@^0.27.8":
   "integrity" "sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA=="
@@ -4309,11 +4304,6 @@
   "resolved" "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-3.3.0.tgz"
   "version" "3.3.0"
 
-"path-to-regexp@8.2.0":
-  "integrity" "sha512-TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ=="
-  "resolved" "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-8.2.0.tgz"
-  "version" "8.2.0"
-
 "path-type@^4.0.0":
   "integrity" "sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw=="
   "resolved" "https://registry.npmjs.org/path-type/-/path-type-4.0.0.tgz"
@@ -4968,12 +4958,10 @@
   "resolved" "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   "version" "1.0.0"
 
-"swagger-ui-dist@5.21.0":
-  "integrity" "sha512-E0K3AB6HvQd8yQNSMR7eE5bk+323AUxjtCz/4ZNKiahOlPhPJxqn3UPIGs00cyY/dhrTDJ61L7C/a8u6zhGrZg=="
-  "resolved" "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-5.21.0.tgz"
-  "version" "5.21.0"
-  dependencies:
-    "@scarf/scarf" "=1.4.0"
+"swagger-ui-dist@5.17.14":
+  "integrity" "sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw=="
+  "resolved" "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-5.17.14.tgz"
+  "version" "5.17.14"
 
 "symbol-observable@4.0.0":
   "integrity" "sha512-b19dMThMV4HVFynSAM1++gBHAbk2Tc/osgLIBZMKsyqh34jb2e8Os7T6ZW/Bt3pJFdBTd2JwAnAAEQV7rSNvcQ=="
