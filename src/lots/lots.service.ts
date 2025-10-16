@@ -282,8 +282,22 @@ export class LotsService {
 
     const result = await this.lotActionRepository.query(`SELECT stage, DATEDIFF(?, date) AS jours_ecoules FROM lot_action WHERE type = 'stage' AND date <= ? AND lotId = ? ORDER BY date DESC LIMIT 1`, [date, date, id]);
 
-    // Retourner le premier élément du tableau ou null si vide
-    return result.length > 0 ? result[0] : null;
+    // Si aucune action de stage trouvée, utiliser les infos du lot lui-même
+    if (result.length === 0) {
+      // Calculer les jours depuis la date de début du lot
+      const joursEcoules = await this.lotRepository.query(
+        `SELECT DATEDIFF(?, dateDebut) AS jours_ecoules FROM lots WHERE id = ?`,
+        [date, id]
+      );
+
+      return {
+        stage: lot.etapeCulture.toLowerCase(), // Normaliser en minuscules
+        jours_ecoules: joursEcoules[0].jours_ecoules
+      };
+    }
+
+    // Retourner le premier élément du tableau si des actions existent
+    return result[0];
   }
 
   async makeShareLot(shareLot: CreateShareLots, userId: number) {
