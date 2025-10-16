@@ -237,10 +237,10 @@ export class LotsService {
       initialStageAction.stage = 'semi';
       initialStageAction.description = 'Début de la phase de semi';
     } else if (lot.origine === 'clone_production' || lot.origine === 'clone_test') {
-      initialStageAction.stage = 'Croissance';
+      initialStageAction.stage = 'croissance';
       initialStageAction.description = 'Début de la phase de croissance';
     } else {
-      initialStageAction.stage = 'Croissance';
+      initialStageAction.stage = 'croissance';
       initialStageAction.description = 'Début de la phase de croissance';
     }
 
@@ -815,7 +815,7 @@ export class LotsService {
     stageAction.type = 'stage';
     stageAction.description = 'Début de la phase de croissance';
     stageAction.date = new Date(dto.dateDebut);
-    stageAction.stage = 'Croissance';
+    stageAction.stage = 'croissance';
     await this.lotActionRepository.save(stageAction);
 
     // Créer une action pour historique du prélèvement
@@ -887,7 +887,7 @@ export class LotsService {
     stageAction.type = 'stage';
     stageAction.description = 'Début de la phase de croissance';
     stageAction.date = new Date(dto.dateDebut);
-    stageAction.stage = 'Croissance';
+    stageAction.stage = 'croissance';
     await this.lotActionRepository.save(stageAction);
 
     // Créer une action pour historique du prélèvement
