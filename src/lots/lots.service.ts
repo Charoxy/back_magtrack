@@ -206,6 +206,15 @@ export class LotsService {
     newLot.piedMereId = lot.piedMereId || null;
     newLot.generation = lot.origine === 'clone_production' ? 1 : 0;
 
+    // Définir l'étape de culture en fonction de l'origine
+    if (lot.origine === 'graine') {
+      newLot.etapeCulture = 'semi';
+    } else if (lot.origine === 'clone_production' || lot.origine === 'clone_test') {
+      newLot.etapeCulture = 'Croissance';
+    } else {
+      newLot.etapeCulture = 'Croissance'; // Par défaut
+    }
+
     const lots = await this.lotRepository.save(newLot);
 
     let newEnvLot = new EnvironnementLot();
@@ -217,6 +226,25 @@ export class LotsService {
     newEnvLot.commentaire = null;
 
     await this.environementService.makeEnvironmentLot(newEnvLot, userid)
+
+    // Créer une action de stage initiale pour tracker l'étape de départ
+    const initialStageAction = new LotAction();
+    initialStageAction.lotId = lots.id;
+    initialStageAction.type = 'stage';
+    initialStageAction.date = new Date(String(lot.dateDebut));
+
+    if (lot.origine === 'graine') {
+      initialStageAction.stage = 'semi';
+      initialStageAction.description = 'Début de la phase de semi';
+    } else if (lot.origine === 'clone_production' || lot.origine === 'clone_test') {
+      initialStageAction.stage = 'Croissance';
+      initialStageAction.description = 'Début de la phase de croissance';
+    } else {
+      initialStageAction.stage = 'Croissance';
+      initialStageAction.description = 'Début de la phase de croissance';
+    }
+
+    await this.lotActionRepository.save(initialStageAction);
 
     // Update mother plant stats if applicable
     if (lot.origine === 'clone_production' && lot.piedMereId) {
