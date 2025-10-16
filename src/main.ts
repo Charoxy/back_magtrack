@@ -4,6 +4,7 @@ import { ValidationPipe } from "@nestjs/common";
 import * as cookieParser from 'cookie-parser';
 import { GlobalSanitizePipe } from "./pipe/GlobalSanitizePipe";
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as express from 'express';
 
 async function bootstrap() {
   console.log('=== APPLICATION STARTING ===');
@@ -18,6 +19,10 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
+
+  // Configurer la taille maximale pour les uploads à 2MB
+  app.use(express.json({ limit: '2mb' }));
+  app.use(express.urlencoded({ limit: '2mb', extended: true }));
 
   app.enableCors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
