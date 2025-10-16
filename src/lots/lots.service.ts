@@ -280,7 +280,10 @@ export class LotsService {
       throw new HttpException("Vous n'avez pas accès à cette ressource", HttpStatus.FORBIDDEN);
     }
 
-    return await this.lotActionRepository.query(`SELECT stage, DATEDIFF(?, date) AS jours_ecoules FROM lot_action WHERE type = 'stage' AND date <= ? AND lotId = ? ORDER BY date DESC LIMIT 1`, [date, date, id]);
+    const result = await this.lotActionRepository.query(`SELECT stage, DATEDIFF(?, date) AS jours_ecoules FROM lot_action WHERE type = 'stage' AND date <= ? AND lotId = ? ORDER BY date DESC LIMIT 1`, [date, date, id]);
+
+    // Retourner le premier élément du tableau ou null si vide
+    return result.length > 0 ? result[0] : null;
   }
 
   async makeShareLot(shareLot: CreateShareLots, userId: number) {
