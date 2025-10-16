@@ -37,7 +37,7 @@ export class Lot {
   @Column()
   planteQuantite: number;
 
-  @Column({type: 'enum', enum: ['Croissance', 'Floraison', 'Sechage', 'Maturation', 'Stockage',], default: 'Croissance'})
+  @Column({type: 'enum', enum: ['Semi', 'Croissance', 'Floraison', 'Sechage', 'Maturation', 'Stockage',], default: 'Semi'})
   etapeCulture: string;
 
   @Column({nullable: true})

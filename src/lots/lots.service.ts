@@ -208,11 +208,11 @@ export class LotsService {
 
     // Définir l'étape de culture en fonction de l'origine
     if (lot.origine === 'graine') {
-      newLot.etapeCulture = 'semi';
+      newLot.etapeCulture = 'Semi';
     } else if (lot.origine === 'clone_production' || lot.origine === 'clone_test') {
       newLot.etapeCulture = 'Croissance';
     } else {
-      newLot.etapeCulture = 'Croissance'; // Par défaut
+      newLot.etapeCulture = 'Semi'; // Par défaut
     }
 
     const lots = await this.lotRepository.save(newLot);
