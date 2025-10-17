@@ -42,15 +42,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
   @ApiResponse({
     status: 201,
-    description: 'Utilisateur créé avec succès',
+    description: 'Utilisateur créé avec succès, cookie JWT défini',
     schema: {
-      example: { access_token: 'jwt_token...', email: 'user@example.com' }
+      example: { success: true, message: 'Inscription réussie', email: 'user@example.com' }
     }
   })
-  @ApiResponse({ status: 400, description: 'Données invalides ou email déjà utilisé' })
-  async register(@Body() userMakeDto: CreateUserDto) {
-    const result = await this.authService.register(userMakeDto);
-    return { ...result, email: userMakeDto.email };
+  @ApiResponse({ status: 409, description: 'Cet email est déjà utilisé' })
+  @ApiResponse({ status: 400, description: 'Données invalides' })
+  async register(@Res({ passthrough: true }) res: Response, @Body() userMakeDto: CreateUserDto) {
+    const jwt = await this.authService.register(userMakeDto);
+
+    res.cookie('token', jwt, {
+      httpOnly: true,
+      secure: false,    // true si HTTPS (production)
+      sameSite: 'lax',  // ou 'none' si HTTPS cross-domain
+      path: '/',
+    });
+
+    return { success: true, message: 'Inscription réussie', email: userMakeDto.email };
   }
 
   @UseGuards(AuthGuard)
